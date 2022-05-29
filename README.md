@@ -1,2 +1,2 @@
-# OpenCV-e-meter-
+# OpenCV-e-meter
 Use OpenCV to identify electrical meter readings
