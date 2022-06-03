@@ -193,7 +193,7 @@ class FrameProcessor:
             # if self.debug:
             #     print(aspect)
 
-            # It's a square, save the contour as a potential digit             #todo 调参侠
+            # It's a square, save the contour as a potential digit
             if size > 100 and aspect >= 0.1 and aspect <= 1:
                 potential_digits.append(contour)
 
@@ -208,6 +208,7 @@ class FrameProcessor:
             #     continue
 
             # If the contour is of decent size and fits the aspect ratios we want, we'll save it
+            # todo 调参侠
             if ((
                     size > 2000 and aspect >= desired_aspect - aspect_buffer and aspect <= desired_aspect + aspect_buffer) or
                     (
@@ -245,17 +246,34 @@ class FrameProcessor:
         inverse = inverse_colors(eroded)
         debug_images.append(('Inversed', inverse))
 
+        print(len(potential_digits))
+        del_list = []
+        for i in range(len(potential_digits)):
+            for j in range(i + 1, len(potential_digits)):
+                (i_x, i_y, i_w, i_h) = cv2.boundingRect(potential_digits[i])
+                (j_x, j_y, j_w, j_h) = cv2.boundingRect(potential_digits[j])
+                i_mid = (i_x + i_x + i_w) / 2
+                j_mid = (j_x + j_x + j_w) / 2
+                if abs(i_mid - j_mid) < 15:
+                    del_list.append(j if i_w * i_h > j_w * j_h else i)
+        delta = 0
+        print("dl:" + str(del_list))
+        for i in range(len(del_list)):
+            del potential_digits[del_list[i] - delta]
+            delta = delta + 1
+
         # Loop over all the potential digits and see if they are candidates to run through KNN to get the digit
         # for pot_digit in potential_digits:
         #     [x, y, w, h] = cv2.boundingRect(pot_digit)
         for i in range(len(potential_digits)):
             (x, y, w, h) = cv2.boundingRect(potential_digits[i])
 
-            # Does this contour match the averages            #todo 调参侠
+            # Does this contour match the averages
             # if h <= avg_digit_height * 1.2 and h >= avg_digit_height * 0.2 and y <= avg_digit_height * 1.2 and y >= avg_digit_y * 0.2:
+            # todo 去除中心相似的轮廓,保留更大的一个;根据明度调整alpha
             if self.debug:
                 print(w * h)
-            if w * h > 800:
+            if w * h > 400:
                 # Crop the contour off the eroded image
                 cropped = inverse[y:y + h, x: x + w]
                 # Draw a rect around it
