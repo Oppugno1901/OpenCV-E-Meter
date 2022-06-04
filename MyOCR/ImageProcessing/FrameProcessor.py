@@ -19,7 +19,6 @@ class FrameProcessor:
         self.width = 0
         self.original = None
         self.write_digits = write_digits
-
         self.knn = self.train_knn(self.version)
 
     def set_image(self, file_name):
@@ -28,6 +27,7 @@ class FrameProcessor:
         self.detect_reading()
         self.original, self.width = self.resize_to_height(self.height)
         self.img = self.original.copy()
+        self.original = cv2.imread(file_name)
 
     def resize_to_height(self, height):
         r = self.img.shape[0] / float(height)
@@ -110,7 +110,7 @@ class FrameProcessor:
     #                   aspect_buffer=ProcessingVariables.aspect_buffer, alpha=ProcessingVariables.alpha):
     def process_image(self, blur, threshold, adjustment, erode, iterations, desired_aspect, digit_one_aspect,
                       aspect_buffer, alpha):
-        self.img = self.original.copy()
+        # self.img = self.original.copy()
 
         debug_images = []
 
